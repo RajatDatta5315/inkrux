@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+body { background: #09090d; color: #e0e0e0; font-family: 'JetBrains Mono', monospace; }
+::selection { background: rgba(124,58,237,0.4); }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #09090d; }
+::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 2px; }
+
+.prose h1, .prose h2, .prose h3 { color: #fff; font-weight: 800; }
+.prose h2 { border-left: 3px solid #7c3aed; padding-left: 1rem; margin: 2rem 0 1rem; }
+.prose p { color: #aaa; line-height: 1.8; margin-bottom: 1rem; }
+.prose code { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; font-size: 0.875em; color: #06b6d4; }
+.prose pre { background: #101018; border: 1px solid #1a1a2e; padding: 1.5rem; border-radius: 12px; overflow-x: auto; }
+.prose pre code { background: none; padding: 0; color: #e0e0e0; }
+.prose blockquote { border-left: 3px solid #ec4899; padding-left: 1rem; color: #888; font-style: italic; }
+.prose a { color: #7c3aed; text-decoration: underline; }
+.prose ul li { color: #aaa; margin-bottom: 0.5rem; }
+.prose strong { color: #fff; }
