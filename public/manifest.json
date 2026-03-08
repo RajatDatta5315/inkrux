@@ -1,0 +1,12 @@
+{
+  "name": "INKRUX — Dark Articles for Builders",
+  "short_name": "INKRUX",
+  "description": "The article and newsletter platform for indie hackers, SaaS builders, and AI developers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090d",
+  "theme_color": "#7c3aed",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }
+  ]
+}

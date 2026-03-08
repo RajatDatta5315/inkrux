@@ -1,0 +1,8 @@
+product: INKRUX
+type: Article & Newsletter Platform
+url: https://inkrux.kryv.network
+category: Content, Publishing, Developer Tools
+audience: Indie hackers, SaaS founders, AI developers
+network: KRYV Network
+pricing: Free
+status: Active

@@ -1,0 +1,25 @@
+# INKRUX
+
+> Dark article and newsletter platform for indie hackers, SaaS builders, and AI developers. No paywalls. No fluff. Pure builder signal.
+
+## What is INKRUX?
+INKRUX (inkrux.kryv.network) is the publishing platform of the KRYV Network. Builders write about AI, SaaS, indie hacking, development, and marketing. Every article is written by someone actively shipping.
+
+## Core Features
+- Markdown article publishing
+- Weekly newsletter (Sunday drops)
+- Tag filtering: AI, SaaS, Indie Hacking, Development, Marketing, Growth
+- No paywalls — all content free forever
+
+## Target Audience
+Indie hackers, SaaS founders, AI developers, bootstrapped builders
+
+## Key URLs
+- Platform: https://inkrux.kryv.network
+- Write: https://inkrux.kryv.network/write
+- Newsletter: https://inkrux.kryv.network/newsletter
+
+## AI Crawler Permissions
+GPTBot: Allow / Claude-Web: Allow / PerplexityBot: Allow / anthropic-ai: Allow
+
+*Part of KRYV Network — kryv.network*
