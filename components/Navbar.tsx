@@ -1,29 +1,37 @@
 'use client';
 import Link from 'next/link';
 import { useState } from 'react';
-import { Pen, Search, Menu, X, Rss } from 'lucide-react';
+import { PenLine, Rss, X, Menu } from 'lucide-react';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   return (
-    <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: 'rgba(9,9,13,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(124,58,237,0.15)' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px' }}>
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ width: '28px', height: '28px', background: 'linear-gradient(135deg, #7c3aed, #ec4899)', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Pen size={14} color="white" />
-          </div>
-          <span style={{ fontSize: '18px', fontWeight: 900, letterSpacing: '-0.05em', color: '#fff' }}>INK<span style={{ color: '#7c3aed' }}>RUX</span></span>
-        </Link>
+    <>
+      <nav style={{ position:'sticky',top:0,zIndex:100,background:'rgba(4,4,5,0.92)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBottom:'1px solid rgba(255,255,255,0.055)' }}>
+        <div style={{ maxWidth:1140,margin:'0 auto',padding:'0 24px',display:'flex',alignItems:'center',justifyContent:'space-between',height:58 }}>
+          {/* Logo */}
+          <Link href="/" style={{ textDecoration:'none',display:'flex',alignItems:'center',gap:10 }}>
+            <div style={{ width:30,height:30,background:'#22c55e',borderRadius:7,display:'flex',alignItems:'center',justifyContent:'center' }}>
+              <span style={{ fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:12,color:'#040405',letterSpacing:'-0.05em' }}>IX</span>
+            </div>
+            <span style={{ fontFamily:"'Sora',sans-serif",fontSize:16,fontWeight:800,letterSpacing:'-0.04em',color:'#f0f0f0' }}>
+              INK<span style={{ color:'#22c55e' }}>RUX</span>
+            </span>
+          </Link>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Link href="/write" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: 'linear-gradient(135deg, #7c3aed, #ec4899)', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', fontWeight: 700, color: '#fff', letterSpacing: '0.05em' }}>
-            <Pen size={12} /> Write
-          </Link>
-          <Link href="/newsletter" style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '8px', textDecoration: 'none', fontSize: '12px', color: '#aaa', letterSpacing: '0.05em' }}>
-            <Rss size={12} /> Subscribe
-          </Link>
+          {/* Nav links */}
+          <div style={{ display:'flex',alignItems:'center',gap:6 }}>
+            <Link href="/newsletter" style={{ display:'flex',alignItems:'center',gap:5,padding:'7px 14px',border:'1px solid rgba(255,255,255,0.06)',borderRadius:8,textDecoration:'none',fontSize:12,color:'rgba(240,240,240,0.45)',fontFamily:"'Sora',sans-serif",fontWeight:600,transition:'all 0.15s' }}
+              onMouseEnter={e=>{(e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.12)';(e.currentTarget as HTMLElement).style.color='rgba(240,240,240,0.75)'}}
+              onMouseLeave={e=>{(e.currentTarget as HTMLElement).style.borderColor='rgba(255,255,255,0.06)';(e.currentTarget as HTMLElement).style.color='rgba(240,240,240,0.45)'}}>
+              <Rss size={11} /> Subscribe
+            </Link>
+            <Link href="/write" style={{ display:'flex',alignItems:'center',gap:6,padding:'7px 16px',background:'#22c55e',borderRadius:8,textDecoration:'none',fontSize:12,fontWeight:800,color:'#040405',fontFamily:"'Sora',sans-serif",letterSpacing:'0.01em' }}>
+              <PenLine size={12} /> Write
+            </Link>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   );
 }

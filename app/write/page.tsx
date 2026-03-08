@@ -26,18 +26,18 @@ export default function WritePage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#09090d' }}>
+    <div style={{ minHeight: '100vh', background: '#040405' }}>
       <Navbar />
       <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
           <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#fff', margin: 0 }}>Write an Article</h1>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => setPreview(!preview)}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', border: '1px solid #1a1a2e', borderRadius: '8px', background: 'transparent', color: '#aaa', fontSize: '12px', cursor: 'pointer', fontFamily: 'inherit' }}>
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', border: '1px solid #1a1a2e', borderRadius: '8px', background: 'transparent', color: '#aaa', fontSize: '12px', cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
               {preview ? <><Edit3 size={12} /> Edit</> : <><Eye size={12} /> Preview</>}
             </button>
             <button onClick={handlePublish}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: 'linear-gradient(135deg, #7c3aed, #ec4899)', borderRadius: '8px', border: 'none', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#22c55e', borderRadius: '8px', border: 'none', color: '#fff', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
               <Send size={12} /> {status === 'publishing' ? 'Publishing...' : status === 'published' ? '✓ Published!' : 'Publish'}
             </button>
           </div>
@@ -47,13 +47,13 @@ export default function WritePage() {
           <input
             placeholder="Article title..."
             value={title} onChange={(e) => setTitle(e.target.value)}
-            style={{ width: '100%', background: 'transparent', border: 'none', fontSize: '28px', fontWeight: 900, color: '#fff', outline: 'none', marginBottom: '20px', fontFamily: 'inherit' }}
+            style={{ width: '100%', background: 'transparent', border: 'none', fontSize: '28px', fontWeight: 900, color: '#fff', outline: 'none', marginBottom: '20px', fontFamily: "'Sora',sans-serif" }}
           />
 
           <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
             {TAGS.map(t => (
               <button key={t} onClick={() => setTag(t)}
-                style={{ padding: '6px 14px', borderRadius: '20px', border: `1px solid ${tag === t ? '#7c3aed' : '#1a1a2e'}`, background: tag === t ? 'rgba(124,58,237,0.15)' : 'transparent', fontSize: '11px', color: tag === t ? '#7c3aed' : '#555', cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ padding: '6px 14px', borderRadius: '20px', border: `1px solid ${tag === t ? '#22c55e' : '#1a1a2e'}`, background: tag === t ? 'rgba(34,197,94,0.12)' : 'transparent', fontSize: '11px', color: tag === t ? '#22c55e' : '#555', cursor: 'pointer', fontFamily: "'Sora',sans-serif" }}>
                 {t}
               </button>
             ))}
@@ -73,7 +73,7 @@ Tell them what they will learn in the first sentence.
 ## The Meat
 Share the real insight. Be specific. Give examples."
               value={content} onChange={(e) => setContent(e.target.value)}
-              style={{ width: '100%', minHeight: '500px', background: 'transparent', border: 'none', color: '#e0e0e0', outline: 'none', fontSize: '15px', lineHeight: 1.8, resize: 'vertical', fontFamily: 'inherit' }}
+              style={{ width: '100%', minHeight: '500px', background: 'transparent', border: 'none', color: '#e0e0e0', outline: 'none', fontSize: '15px', lineHeight: 1.8, resize: 'vertical', fontFamily: "'Sora',sans-serif" }}
             />
           )}
         </div>
