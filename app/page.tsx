@@ -8,12 +8,12 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.inkrux.kryv.network'
 const TAGS = ['All', 'AI', 'SaaS', 'Dev', 'Indie Hacking', 'Marketing', 'Growth'];
 
 const TAG_META: Record<string, { bg: string; text: string; border: string }> = {
-  AI:            { bg: 'rgba(88,196,255,0.08)',  text: '#58c4ff', border: 'rgba(88,196,255,0.2)' },
-  SaaS:          { bg: 'rgba(61,214,140,0.08)',  text: '#3dd68c', border: 'rgba(61,214,140,0.2)' },
-  Dev:           { bg: 'rgba(240,192,64,0.08)',  text: '#f0c040', border: 'rgba(240,192,64,0.2)' },
-  'Indie Hacking':{ bg: 'rgba(255,255,255,0.06)', text: 'rgba(255,255,255,0.6)', border: 'rgba(255,255,255,0.12)' },
-  Marketing:     { bg: 'rgba(200,160,255,0.08)', text: '#c8a0ff', border: 'rgba(200,160,255,0.2)' },
-  Growth:        { bg: 'rgba(255,140,100,0.08)', text: '#ff8c64', border: 'rgba(255,140,100,0.2)' },
+  AI:            { bg: 'rgba(255,255,255,0.06)', text: 'rgba(255,255,255,0.75)', border: 'rgba(255,255,255,0.12)' },
+  SaaS:          { bg: 'rgba(255,255,255,0.04)', text: 'rgba(255,255,255,0.6)',  border: 'rgba(255,255,255,0.09)' },
+  Dev:           { bg: 'rgba(255,255,255,0.06)', text: 'rgba(255,255,255,0.75)', border: 'rgba(255,255,255,0.12)' },
+  'Indie Hacking':{ bg: 'rgba(255,255,255,0.04)', text: 'rgba(255,255,255,0.5)', border: 'rgba(255,255,255,0.08)' },
+  Marketing:     { bg: 'rgba(255,255,255,0.04)', text: 'rgba(255,255,255,0.55)', border: 'rgba(255,255,255,0.09)' },
+  Growth:        { bg: 'rgba(255,255,255,0.05)', text: 'rgba(255,255,255,0.6)',  border: 'rgba(255,255,255,0.1)' },
 };
 
 const SAMPLE: any[] = [
@@ -38,7 +38,7 @@ function ArticleCard({ a, i, featured }: { a: any; i: number; featured?: boolean
         onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.14)'}
         onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'}>
         {/* subtle top accent line */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(88,196,255,0.3), transparent)' }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.12em', textTransform: 'uppercase' }}>Featured</span>
           <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'inline-block' }} />
