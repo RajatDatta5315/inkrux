@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Navbar from '../components/Navbar';
-import { TrendingUp, Clock, Tag, ArrowRight, Zap, Globe, Code2 } from 'lucide-react';
+import { TrendingUp, Clock, Tag, ArrowRight, Zap, Globe, Code2, Pen } from 'lucide-react';
 
 const TAGS = ['All', 'AI', 'SaaS', 'Indie Hacking', 'Development', 'Marketing', 'Growth'];
 
