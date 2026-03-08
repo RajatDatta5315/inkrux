@@ -1,106 +1,98 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Search, Pen } from 'lucide-react';
+import { ArrowRight, Search, Terminal, Zap, BookOpen } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://api.inkrux.kryv.network';
 
-const TAGS = ['All', 'AI', 'SaaS', 'Indie Hacking', 'Development', 'Marketing', 'Growth'];
+const TAGS = ['All', 'AI', 'SaaS', 'Dev', 'Indie Hacking', 'Marketing', 'Growth'];
 
-const TAG_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  AI:            { bg: 'rgba(124,58,237,0.1)',  text: '#a78bfa', border: 'rgba(124,58,237,0.25)' },
-  SaaS:          { bg: 'rgba(6,182,212,0.1)',   text: '#22d3ee', border: 'rgba(6,182,212,0.25)'  },
-  'Indie Hacking':{ bg: 'rgba(236,72,153,0.1)', text: '#f472b6', border: 'rgba(236,72,153,0.25)' },
-  Development:   { bg: 'rgba(34,197,94,0.1)',   text: '#4ade80', border: 'rgba(34,197,94,0.25)'  },
-  Marketing:     { bg: 'rgba(251,146,60,0.1)',  text: '#fb923c', border: 'rgba(251,146,60,0.25)'  },
-  Growth:        { bg: 'rgba(250,204,21,0.1)',  text: '#fbbf24', border: 'rgba(250,204,21,0.25)'  },
+const TAG_META: Record<string, { bg: string; text: string; border: string }> = {
+  AI:            { bg: 'rgba(88,196,255,0.08)',  text: '#58c4ff', border: 'rgba(88,196,255,0.2)' },
+  SaaS:          { bg: 'rgba(61,214,140,0.08)',  text: '#3dd68c', border: 'rgba(61,214,140,0.2)' },
+  Dev:           { bg: 'rgba(240,192,64,0.08)',  text: '#f0c040', border: 'rgba(240,192,64,0.2)' },
+  'Indie Hacking':{ bg: 'rgba(255,255,255,0.06)', text: 'rgba(255,255,255,0.6)', border: 'rgba(255,255,255,0.12)' },
+  Marketing:     { bg: 'rgba(200,160,255,0.08)', text: '#c8a0ff', border: 'rgba(200,160,255,0.2)' },
+  Growth:        { bg: 'rgba(255,140,100,0.08)', text: '#ff8c64', border: 'rgba(255,140,100,0.2)' },
 };
 
-const SAMPLE_ARTICLES = [
-  { id: '1', slug: 'how-i-got-100-users-without-ads', title: 'How I got my first 100 users without spending a dollar on ads', tag: 'Indie Hacking', author: 'Rajat', created_at: '2026-03-01', views: 1240, read_time: 6 },
-  { id: '2', slug: 'ai-agents-replacing-sdr', title: 'AI agents will replace SDRs by 2027 — here is why', tag: 'AI', author: 'Rajat', created_at: '2026-03-03', views: 3400, read_time: 8 },
-  { id: '3', slug: 'building-saas-cloudflare-workers', title: 'Why I build every backend on Cloudflare Workers (not AWS)', tag: 'Development', author: 'Rajat', created_at: '2026-03-05', views: 891, read_time: 5 },
-  { id: '4', slug: 'geo-optimization-2026', title: 'GEO will be more important than SEO by 2026. Here is the playbook.', tag: 'Marketing', author: 'Rajat', created_at: '2026-03-07', views: 2100, read_time: 7 },
-  { id: '5', slug: 'revenue-before-product', title: 'I charged $99 before writing a single line of code', tag: 'SaaS', author: 'Rajat', created_at: '2026-03-08', views: 5600, read_time: 4 },
+const SAMPLE: any[] = [
+  { id:'1', slug:'first-100-users-zero-spend', title:'How I got my first 100 users without spending a dollar', tag:'Indie Hacking', author:'Rajat', created_at:'2026-03-01', views:1240, read_time:6 },
+  { id:'2', slug:'ai-agents-replacing-sdr-2027', title:'AI agents will replace SDRs by 2027 — the numbers already show it', tag:'AI', author:'Rajat', created_at:'2026-03-03', views:3400, read_time:8 },
+  { id:'3', slug:'cloudflare-workers-over-aws', title:'Why I run every backend on Cloudflare Workers instead of AWS', tag:'Dev', author:'Rajat', created_at:'2026-03-05', views:891, read_time:5 },
+  { id:'4', slug:'geo-beats-seo-2026', title:'GEO will matter more than SEO. Here is the full playbook for 2026.', tag:'Marketing', author:'Rajat', created_at:'2026-03-07', views:2100, read_time:7 },
+  { id:'5', slug:'charged-99-before-code', title:'I charged $99 before writing a single line of code', tag:'SaaS', author:'Rajat', created_at:'2026-03-08', views:5600, read_time:4 },
+  { id:'6', slug:'llms-txt-every-saas', title:'Every SaaS in 2026 needs an llms.txt. Here is why and how.', tag:'AI', author:'Rajat', created_at:'2026-03-08', views:1800, read_time:5 },
 ];
 
 function TagBadge({ tag }: { tag: string }) {
-  const c = TAG_COLORS[tag] || { bg: 'rgba(255,255,255,0.05)', text: 'rgba(255,255,255,0.4)', border: 'rgba(255,255,255,0.1)' };
-  return (
-    <span style={{ background: c.bg, color: c.text, border: `1px solid ${c.border}` }} className="tag">
-      {tag}
-    </span>
-  );
+  const m = TAG_META[tag] || { bg: 'rgba(255,255,255,0.05)', text: 'rgba(255,255,255,0.35)', border: 'rgba(255,255,255,0.1)' };
+  return <span style={{ background: m.bg, color: m.text, border: `1px solid ${m.border}` }} className="tag">{tag}</span>;
 }
 
-function ArticleCard({ article, index }: { article: any; index: number }) {
-  return (
-    <Link href={`/article/${article.slug}`} style={{ animationDelay: `${index * 60}ms` }}
-      className="group block rounded-2xl glass p-6 hover:bg-white/[0.045] transition-all duration-300 hover:-translate-y-0.5 animate-up">
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <TagBadge tag={article.tag} />
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 10, color: 'rgba(255,255,255,0.2)', whiteSpace: 'nowrap' }}>
-          {article.read_time}m read · {article.views?.toLocaleString()} views
-        </span>
-      </div>
-      <h2 style={{ fontFamily: "'Instrument Serif', serif", fontSize: '1.3rem', color: '#fff', lineHeight: 1.35, fontWeight: 400, letterSpacing: '-0.01em', marginBottom: '1rem' }}
-        className="group-hover:text-purple-300 transition-colors">
-        {article.title}
-      </h2>
-      <div className="flex items-center justify-between">
-        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
-          by {article.author} · {new Date(article.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-        </div>
-        <ArrowRight size={15} className="text-purple-500 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
-      </div>
-    </Link>
-  );
-}
-
-function FeaturedCard({ article }: { article: any }) {
-  return (
-    <Link href={`/article/${article.slug}`}
-      className="group block col-span-full rounded-2xl overflow-hidden relative animate-up"
-      style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(236,72,153,0.08))', border: '1px solid rgba(124,58,237,0.2)', padding: '40px 44px', minHeight: 220 }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 80% 50%, rgba(124,58,237,0.06) 0%, transparent 60%)', pointerEvents: 'none' }} />
-      <div className="relative z-10">
+function ArticleCard({ a, i, featured }: { a: any; i: number; featured?: boolean }) {
+  if (featured) {
+    return (
+      <Link href={`/article/${a.slug}`} className="animate-up"
+        style={{ display: 'block', gridColumn: '1 / -1', textDecoration: 'none', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '36px 40px', position: 'relative', overflow: 'hidden', animationDelay: '0ms', transition: 'border-color 0.2s' }}
+        onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.14)'}
+        onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'}>
+        {/* subtle top accent line */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1, background: 'linear-gradient(90deg, transparent, rgba(88,196,255,0.3), transparent)' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.15em', textTransform: 'uppercase' }}>Featured</span>
-          <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.2)' }} />
-          <TagBadge tag={article.tag} />
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.12em', textTransform: 'uppercase' }}>Featured</span>
+          <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'inline-block' }} />
+          <TagBadge tag={a.tag} />
         </div>
-        <h2 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 'clamp(1.4rem, 3vw, 2rem)', color: '#fff', fontWeight: 400, letterSpacing: '-0.02em', lineHeight: 1.25, maxWidth: 640, marginBottom: 20 }}
-          className="group-hover:text-purple-200 transition-colors">
-          {article.title}
+        <h2 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 'clamp(1.5rem, 3vw, 2.1rem)', color: '#fff', fontWeight: 400, letterSpacing: '-0.02em', lineHeight: 1.25, maxWidth: 680, marginBottom: 20 }}>
+          {a.title}
         </h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>by {article.author}</span>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>{article.read_time}m read</span>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)' }}>{article.views?.toLocaleString()} views</span>
+          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', fontFamily: "'JetBrains Mono', monospace" }}>by {a.author}</span>
+          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', fontFamily: "'JetBrains Mono', monospace" }}>{a.read_time}min</span>
+          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', fontFamily: "'JetBrains Mono', monospace" }}>{a.views?.toLocaleString()} views</span>
         </div>
+      </Link>
+    );
+  }
+  return (
+    <Link href={`/article/${a.slug}`} className="group animate-up"
+      style={{ display: 'flex', flexDirection: 'column', textDecoration: 'none', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '24px', animationDelay: `${i * 50}ms`, transition: 'border-color 0.2s, background 0.2s' }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.045)'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.07)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+        <TagBadge tag={a.tag} />
+        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.18)', fontFamily: "'JetBrains Mono', monospace" }}>{a.read_time}m</span>
+      </div>
+      <h2 style={{ fontFamily: "'Instrument Serif', serif", fontSize: '1.2rem', color: '#f0f0f5', fontWeight: 400, letterSpacing: '-0.01em', lineHeight: 1.35, flex: 1, marginBottom: 16 }}>
+        {a.title}
+      </h2>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', fontFamily: "'JetBrains Mono', monospace" }}>@{a.author}</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.15)', fontFamily: "'JetBrains Mono', monospace" }}>{a.views?.toLocaleString()}</span>
+        </div>
+        <ArrowRight size={14} style={{ color: 'rgba(255,255,255,0.2)', transition: 'color 0.2s, transform 0.2s' }} />
       </div>
     </Link>
   );
 }
 
 export default function Home() {
-  const [articles, setArticles] = useState<any[]>(SAMPLE_ARTICLES);
+  const [articles, setArticles] = useState<any[]>(SAMPLE);
   const [tag, setTag] = useState('All');
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch(`${API}/api/articles`)
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data) && data.length > 0) setArticles([...data, ...SAMPLE_ARTICLES]); })
+    fetch(`${API}/api/articles`).then(r => r.json())
+      .then(d => { if (Array.isArray(d) && d.length) setArticles([...d, ...SAMPLE]); })
       .catch(() => {});
   }, []);
 
   const filtered = articles.filter(a => {
     const matchTag = tag === 'All' || a.tag === tag;
     const q = search.toLowerCase();
-    const matchSearch = !q || a.title.toLowerCase().includes(q) || a.author?.toLowerCase().includes(q);
-    return matchTag && matchSearch;
+    return matchTag && (!q || a.title.toLowerCase().includes(q) || a.author?.toLowerCase().includes(q));
   });
 
   const featured = filtered[0];
@@ -108,81 +100,86 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', position: 'relative' }}>
-      <div className="ambient-1" /><div className="ambient-2" />
+      <div className="ambient-top" />
 
       {/* NAV */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', background: 'rgba(5,5,10,0.75)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 24px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', background: 'rgba(6,6,9,0.85)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 24px' }}>
+        <div style={{ maxWidth: 1060, margin: '0 auto', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #7c3aed, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 13, color: '#fff' }}>IX</span>
+            <div style={{ width: 26, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Terminal size={12} color="rgba(255,255,255,0.7)" />
             </div>
-            <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 17, letterSpacing: '-0.03em', color: '#fff' }}>INKRUX</span>
-            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.12em', textTransform: 'uppercase', marginLeft: 4 }}>for builders</span>
+            <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 14, color: '#fff', letterSpacing: '0.04em' }}>INKRUX</span>
+            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.1em' }}>/ for builders</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Link href="/newsletter" style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', padding: '7px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.07)' }}>Newsletter</Link>
-            <Link href="/write" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'linear-gradient(135deg, #7c3aed, #ec4899)', borderRadius: 10, fontSize: 13, fontWeight: 700, color: '#fff', textDecoration: 'none' }}>
-              <Pen size={13} /> Write
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Link href="/newsletter" style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration: 'none', padding: '6px 12px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.07)' }}>
+              <BookOpen size={13} style={{ display: 'inline', marginRight: 5, verticalAlign: 'middle' }} />Newsletter
+            </Link>
+            <Link href="/write" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, fontSize: 13, fontWeight: 600, color: '#fff', textDecoration: 'none' }}>
+              Write →
             </Link>
           </div>
         </div>
       </nav>
 
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '52px 24px 80px', position: 'relative', zIndex: 1 }}>
-        {/* Hero headline */}
-        <div style={{ marginBottom: 52, textAlign: 'center' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', background: 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.2)', borderRadius: 100, marginBottom: 20 }}>
-            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#7c3aed', display: 'inline-block' }} />
-            <span style={{ fontSize: 11, color: 'rgba(124,58,237,0.9)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Real insights from people who ship</span>
+      <main style={{ maxWidth: 1060, margin: '0 auto', padding: '56px 24px 80px', position: 'relative', zIndex: 1 }}>
+        {/* Hero */}
+        <div style={{ marginBottom: 52 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '4px 12px', background: 'rgba(88,196,255,0.06)', border: '1px solid rgba(88,196,255,0.16)', borderRadius: 4, marginBottom: 20 }}>
+            <Zap size={11} color="#58c4ff" />
+            <span style={{ fontSize: 11, color: '#58c4ff', fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.1em', textTransform: 'uppercase' }}>Real signal from people who ship</span>
           </div>
-          <h1 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 'clamp(2.4rem, 6vw, 4.2rem)', fontWeight: 400, letterSpacing: '-0.03em', lineHeight: 1.1, color: '#fff', marginBottom: 16 }}>
-            Articles for the<br /><span className="grad">builders of tomorrow</span>
+          <h1 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', fontWeight: 400, letterSpacing: '-0.03em', lineHeight: 1.1, color: '#fff', marginBottom: 16 }}>
+            Technical writing<br /><span className="grad-accent">for builders.</span>
           </h1>
-          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)', maxWidth: 480, margin: '0 auto' }}>
-            No paywalls. No fluff. Indie hacking, AI, SaaS — written by founders who are actively shipping.
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)', maxWidth: 440 }}>
+            No paywalls. No fluff. AI, SaaS, indie hacking — written by founders actively building in the KRYV ecosystem.
           </p>
         </div>
 
-        {/* Search + Tags */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 36, flexWrap: 'wrap', alignItems: 'center' }}>
+        {/* Search + filters */}
+        <div style={{ display: 'flex', gap: 10, marginBottom: 36, flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
-            <Search size={14} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.25)' }} />
+            <Search size={13} style={{ position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.22)' }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search articles..."
-              style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 14px 10px 36px', color: '#fff', fontSize: 13, outline: 'none' }} />
+              style={{ width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, padding: '10px 14px 10px 34px', color: '#f0f0f5', fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
           </div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
             {TAGS.map(t => (
               <button key={t} onClick={() => setTag(t)}
-                style={{ padding: '7px 14px', borderRadius: 100, border: `1px solid ${tag === t ? 'rgba(124,58,237,0.5)' : 'rgba(255,255,255,0.08)'}`, background: tag === t ? 'rgba(124,58,237,0.15)' : 'transparent', color: tag === t ? '#a78bfa' : 'rgba(255,255,255,0.4)', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                style={{ padding: '6px 12px', borderRadius: 6, border: `1px solid ${tag === t ? 'rgba(88,196,255,0.35)' : 'rgba(255,255,255,0.07)'}`, background: tag === t ? 'rgba(88,196,255,0.1)' : 'transparent', color: tag === t ? '#58c4ff' : 'rgba(255,255,255,0.4)', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace" }}>
                 {t}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Articles grid */}
+        {/* Grid */}
         {filtered.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0', color: 'rgba(255,255,255,0.2)', fontSize: 13 }}>
-            No articles found. <Link href="/write" style={{ color: '#7c3aed', textDecoration: 'none' }}>Write the first one →</Link>
+            Nothing found. <Link href="/write" style={{ color: '#58c4ff', textDecoration: 'none' }}>Write it →</Link>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
-            {featured && <FeaturedCard article={featured} />}
-            {rest.map((a, i) => <ArticleCard key={a.id || a.slug} article={a} index={i} />)}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
+            {featured && <ArticleCard a={featured} i={0} featured />}
+            {rest.map((a, i) => <ArticleCard key={a.id || a.slug} a={a} i={i} />)}
           </div>
         )}
 
-        {/* Write CTA */}
-        <div style={{ marginTop: 72, padding: '48px 40px', textAlign: 'center' }} className="glass-vivid rounded-2xl">
-          <h2 style={{ fontFamily: "'Instrument Serif', serif", fontSize: '2rem', fontWeight: 400, color: '#fff', marginBottom: 12, letterSpacing: '-0.02em' }}>
+        {/* CTA */}
+        <div style={{ marginTop: 64, padding: '40px', textAlign: 'center', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12 }}>
+          <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', top: -60, left: '50%', transform: 'translateX(-50%)', width: 300, height: 120, background: 'radial-gradient(ellipse, rgba(88,196,255,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          </div>
+          <h2 style={{ fontFamily: "'Instrument Serif', serif", fontSize: '1.8rem', fontWeight: 400, color: '#fff', marginBottom: 10, letterSpacing: '-0.02em' }}>
             Share what you're building
           </h2>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.35)', marginBottom: 28 }}>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', marginBottom: 24, fontFamily: "'JetBrains Mono', monospace" }}>
             Write for the INKRUX audience — builders who actually ship.
           </p>
-          <Link href="/write" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: 'linear-gradient(135deg, #7c3aed, #ec4899)', borderRadius: 12, textDecoration: 'none', fontSize: 14, fontWeight: 700, color: '#fff', boxShadow: '0 8px 32px rgba(124,58,237,0.3)' }}>
-            <Pen size={15} /> Start Writing
+          <Link href="/write" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 8, textDecoration: 'none', fontSize: 14, fontWeight: 700, color: '#fff' }}>
+            Write an article <ArrowRight size={14} />
           </Link>
         </div>
       </main>
