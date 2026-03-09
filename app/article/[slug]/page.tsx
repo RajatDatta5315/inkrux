@@ -4,6 +4,9 @@ import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
 import { ArrowLeft, Clock, Eye, Calendar, Share2 } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Full article content — real articles about the KRYV ecosystem
 const ARTICLES: Record<string, any> = {
   'building-30-saas-in-one-year': {
@@ -391,9 +394,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export function generateStaticParams() {
-  return Object.keys(ARTICLES).map(slug => ({ slug }));
-}
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
