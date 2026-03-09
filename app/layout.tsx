@@ -7,17 +7,27 @@ export const metadata: Metadata = {
   keywords: ['indie hacking', 'SaaS', 'AI', 'developer articles', 'GEO', 'startup'],
   manifest: '/manifest.json',
   themeColor: '#040405',
+  icons: {
+    icon: [
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/logo.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+    shortcut: '/favicon.ico',
+  },
   openGraph: {
     title: 'INKRUX — Articles for Builders',
     description: 'Deep articles on AI, SaaS, and building in public.',
     type: 'website',
     url: 'https://inkrux.kryv.network',
     siteName: 'INKRUX',
+    images: [{ url: '/logo.png', width: 512, height: 512 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'INKRUX — Articles for Builders',
     description: 'Deep articles on AI, SaaS, and building in public.',
+    images: ['/logo.png'],
   },
 };
 
