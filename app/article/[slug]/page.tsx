@@ -125,9 +125,9 @@ For AI: Cloudflare AI runs Llama 3.1 at the edge without any additional API keys
 
 ## The deployment model that changed everything
 
-```bash
+\`\`\`bash
 wrangler deploy
-```
+\`\`\`
 
 That is the entire deployment pipeline. No Docker. No CI/CD configuration. No container registry. One command, deployed globally in under thirty seconds.
 
