@@ -374,15 +374,16 @@ KryvLayer is at kryvlayer.kryv.network. The free tier allows one domain with up 
   },
 };
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const article = ARTICLES[params.slug];
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const article = ARTICLES[slug];
   if (!article) return { title: 'Not Found — INKRUX' };
   return {
     title: `${article.title} — INKRUX`,
     description: article.excerpt,
     openGraph: {
       title: article.title, description: article.excerpt,
-      type: 'article', url: `https://inkrux.kryv.network/article/${params.slug}`,
+      type: 'article', url: `https://inkrux.kryv.network/article/${slug}`,
       images: [{ url: article.image, width: 1200, height: 630 }],
       publishedTime: article.date, authors: [article.author],
     },
@@ -394,8 +395,9 @@ export function generateStaticParams() {
   return Object.keys(ARTICLES).map(slug => ({ slug }));
 }
 
-export default function ArticlePage({ params }: { params: { slug: string } }) {
-  const article = ARTICLES[params.slug];
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const article = ARTICLES[slug];
   if (!article) notFound();
 
   const jsonLd = {
@@ -407,7 +409,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
     author: { '@type': 'Person', name: article.author },
     publisher: { '@type': 'Organization', name: 'INKRUX', url: 'https://inkrux.kryv.network' },
     datePublished: article.date,
-    mainEntityOfPage: `https://inkrux.kryv.network/article/${params.slug}`,
+    mainEntityOfPage: `https://inkrux.kryv.network/article/${slug}`,
   };
 
   // Convert markdown-ish content to HTML
