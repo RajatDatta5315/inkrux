@@ -89,7 +89,7 @@ export async function GET() {
       <pubDate>${a.date}</pubDate>
       <author>rajat@kryv.network (${a.author})</author>
       <category>${a.tag}</category>
-      <enclosure url="${a.image}" type="image/jpeg" length="0"/>
+      <enclosure url="${a.image.replace(/&/g, '&amp;')}" type="image/jpeg" length="0"/>
       <source url="${SITE_URL}/api/feed.xml">${SITE_TITLE}</source>
     </item>`).join('');
 
@@ -102,7 +102,7 @@ export async function GET() {
   <channel>
     <title>${SITE_TITLE}</title>
     <link>${SITE_URL}</link>
-    <description>${SITE_DESCRIPTION}</description>
+    <description><![CDATA[${SITE_DESCRIPTION}]]></description>
     <language>en-US</language>
     <managingEditor>rajat@kryv.network (Rajat)</managingEditor>
     <webMaster>rajat@kryv.network (Rajat)</webMaster>
