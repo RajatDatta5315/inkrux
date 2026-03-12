@@ -1,188 +1,99 @@
 'use client';
 import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+
+const RELAY_API = 'https://scrapyr-api.rajatdatta90000.workers.dev';
 
 function WriteContent() {
+  const params = useSearchParams();
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [excerpt, setExcerpt] = useState('');
   const [body, setBody] = useState('');
   const [tags, setTags] = useState('');
-  const [source, setSource] = useState<'ryden' | 'manual'>('manual');
-  const [copyStatus, setCopyStatus] = useState('');
-  const [prStatus, setPrStatus] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Try reading from base64 hash fragment first (RYDEN passes article here)
-    const hash = window.location.hash.slice(1);
-    if (hash) {
-      try {
-        const decoded = JSON.parse(decodeURIComponent(atob(hash)));
-        if (decoded.title) {
-          setTitle(decoded.title || '');
-          setSlug(decoded.slug || '');
-          setExcerpt(decoded.excerpt || '');
-          setBody(decoded.body || '');
-          setTags(Array.isArray(decoded.tags) ? decoded.tags.join(', ') : decoded.tags || '');
-          setSource('ryden');
-          // Clean URL
-          window.history.replaceState(null, '', window.location.pathname);
-        }
-      } catch {}
-    }
-    // Also try URL params fallback
-    const params = new URLSearchParams(window.location.search);
-    if (!hash && params.get('title')) {
-      setTitle(params.get('title') || '');
-      setSlug(params.get('slug') || '');
-      setExcerpt(params.get('excerpt') || '');
-      setBody(params.get('body') || '');
+    const relayId = params.get('relay');
+    if (relayId) {
+      setLoading(true);
+      fetch(`${RELAY_API}/relay/${relayId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.article) {
+            const a = data.article;
+            setTitle(a.title || ''); setSlug(a.slug || '');
+            setExcerpt(a.excerpt || ''); setBody(a.body || '');
+            setTags(Array.isArray(a.tags) ? a.tags.join(', ') : (a.tags || ''));
+          }
+        }).catch(() => {}).finally(() => setLoading(false));
+    } else if (params.get('title')) {
+      setTitle(params.get('title') || ''); setSlug(params.get('slug') || '');
+      setExcerpt(params.get('excerpt') || ''); setBody(params.get('body') || '');
       setTags(params.get('tags') || '');
-      setSource('ryden');
     }
-  }, []);
+  }, [params]);
 
-  const copy = (text: string, label: string) => {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.cssText = 'position:fixed;opacity:0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    setCopyStatus(`✅ ${label} copied!`);
-    setTimeout(() => setCopyStatus(''), 2500);
+  const copyAll = () => {
+    const full = `---\ntitle: ${title}\nslug: ${slug}\nexcerpt: ${excerpt}\ntags: [${tags}]\n---\n\n${body}`;
+    try { navigator.clipboard.writeText(full).then(() => { setCopied(true); setTimeout(() => setCopied(false), 3000); }); }
+    catch {
+      const ta = document.createElement('textarea');
+      ta.value = full; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      setCopied(true); setTimeout(() => setCopied(false), 3000);
+    }
   };
 
-  const copyGitPushCommand = () => {
-    const tagList = tags.split(',').map(t => t.trim()).filter(Boolean);
-    const ts = new Date().toISOString().split('T')[0];
-    const cmd = `# 1. Add article entry to app/article/[slug]/ArticleClient.tsx
-# Slug: ${slug}
-
-# 2. Then push:
-git add -A && git commit -m "feat: new article — ${title}" && git push origin main
-
-# Vercel deploys in ~30s → live at:
-# https://inkrux.kryv.network/article/${slug}`;
-    copy(cmd, 'Git commands');
-  };
-
-  const copyArticleEntry = () => {
-    const tagList = tags.split(',').map(t => `'${t.trim()}'`).filter(Boolean).join(', ');
-    const wordCount = body.split(' ').length;
-    const readMin = Math.ceil(wordCount / 200);
-    const entry = `  '${slug}': {
-    title: '${title.replace(/'/g, "\\'")}',
-    date: '${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}',
-    readTime: '${readMin}m read',
-    views: Math.floor(Math.random() * 900 + 200),
-    tag: ${tagList.split(', ')[0] || "'saas'"},
-    excerpt: '${excerpt.replace(/'/g, "\\'")}',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&q=80',
-    author: 'Rajat',
-    content: \`${body.replace(/`/g, '\\`').replace(/\${/g, '\\${')}\`,
-  },`;
-    copy(entry, 'Article entry');
-  };
-
-  const s = { fontFamily: "'Sora', sans-serif" };
+  const label: React.CSSProperties = { fontSize: 11, color: 'rgba(240,240,240,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: 6 };
+  const input: React.CSSProperties = { width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '11px 14px', color: '#f0f0f0', fontSize: 13, outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#040405', ...s, padding: '40px 24px 80px' }}>
+    <div style={{ minHeight: '100vh', background: '#040405', fontFamily: "'Sora', sans-serif", padding: '48px 24px' }}>
       <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-      <div style={{ maxWidth: 780, margin: '0 auto' }}>
-        {/* Nav */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
-          <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 28, height: 28, background: '#22c55e', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#040405', fontFamily: "'JetBrains Mono',monospace" }}>IX</div>
-            <span style={{ fontSize: 15, fontWeight: 800, color: '#f0f0f0', letterSpacing: '-0.03em' }}>INK<span style={{ color: '#22c55e' }}>RUX</span></span>
-          </a>
-          <span style={{ fontSize: 12, color: 'rgba(240,240,240,0.25)' }}>/ Write</span>
-          {source === 'ryden' && (
-            <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', background: 'rgba(0,243,255,0.08)', border: '1px solid rgba(0,243,255,0.2)', borderRadius: 100, fontSize: 10, color: '#00f3ff', fontFamily: "'JetBrains Mono',monospace" }}>
-              ⚡ FROM RYDEN
-            </span>
-          )}
-        </div>
+      <div style={{ maxWidth: 760, margin: '0 auto' }}>
+        <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 32, width: 'fit-content' }}>
+          <div style={{ width: 28, height: 28, background: '#22c55e', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#040405', fontFamily: "'JetBrains Mono', monospace" }}>IX</div>
+          <span style={{ fontSize: 15, fontWeight: 800, color: '#f0f0f0', letterSpacing: '-0.03em' }}>INK<span style={{ color: '#22c55e' }}>RUX</span></span>
+          <span style={{ fontSize: 12, color: 'rgba(240,240,240,0.3)', marginLeft: 4 }}>/ Publish</span>
+        </a>
 
-        <h1 style={{ fontSize: 26, fontWeight: 800, color: '#f0f0f0', letterSpacing: '-0.03em', marginBottom: 6 }}>
-          {source === 'ryden' ? '✅ Article received from RYDEN' : 'Publish Article to INKRUX'}
-        </h1>
-        <p style={{ fontSize: 13, color: 'rgba(240,240,240,0.35)', marginBottom: 28, lineHeight: 1.6 }}>
-          {source === 'ryden'
-            ? 'Your RYDEN article is ready. Copy the entry and paste it into ArticleClient.tsx, then push.'
-            : 'Fill in article details below, then copy the entry and paste into INKRUX ArticleClient.tsx.'}
-        </p>
+        {loading && <div style={{ textAlign: 'center', padding: '60px', color: 'rgba(240,240,240,0.3)', fontSize: 13 }}>⚡ Loading article from RYDEN...</div>}
 
-        {copyStatus && (
-          <div style={{ marginBottom: 16, padding: '10px 16px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 10, fontSize: 13, color: '#22c55e', fontWeight: 700 }}>
-            {copyStatus}
-          </div>
-        )}
+        {!loading && (
+          <>
+            <div style={{ marginBottom: 24 }}>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#f0f0f0', letterSpacing: '-0.03em', marginBottom: 6 }}>{title || 'New Article'}</h1>
+              {title && <p style={{ fontSize: 12, color: '#22c55e', fontFamily: "'JetBrains Mono',monospace" }}>✅ Article from RYDEN — review, edit, then copy to publish</p>}
+            </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <Field label="Title" value={title} onChange={setTitle} large />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Field label="Slug (URL)" value={slug} onChange={setSlug} mono />
-            <Field label="Tags (comma separated)" value={tags} onChange={setTags} />
-          </div>
-          <Field label="Excerpt" value={excerpt} onChange={setExcerpt} rows={2} />
-          <Field label="Body (Markdown)" value={body} onChange={setBody} rows={22} mono />
-        </div>
-
-        {/* Action buttons */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 20 }}>
-          <button onClick={copyArticleEntry}
-            style={{ padding: '13px', background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 12, color: '#22c55e', fontSize: 13, fontWeight: 800, cursor: 'pointer', ...s }}>
-            📋 Copy Article Entry
-          </button>
-          <button onClick={copyGitPushCommand}
-            style={{ padding: '13px', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', borderRadius: 12, color: '#818cf8', fontSize: 13, fontWeight: 800, cursor: 'pointer', ...s }}>
-            🚀 Copy Git Command
-          </button>
-        </div>
-
-        {/* Instructions */}
-        <div style={{ marginTop: 16, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: '18px 20px' }}>
-          <div style={{ fontSize: 11, color: 'rgba(240,240,240,0.3)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12, fontFamily: "'JetBrains Mono',monospace" }}>How to publish:</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {[
-              ['1', 'Click "Copy Article Entry" above'],
-              ['2', 'Open terminal → nano ~/kryv-empire/inkrux/app/article/[slug]/ArticleClient.tsx'],
-              ['3', 'Find the ARTICLES object, paste your entry at the top'],
-              ['4', 'Also add slug to app/sitemap.ts SLUGS array'],
-              ['5', 'git add -A && git commit -m "feat: article — ' + (slug || 'your-slug') + '" && git push'],
-              ['6', '✅ Live at inkrux.kryv.network/article/' + (slug || 'your-slug') + ' in ~30s'],
-            ].map(([n, step]) => (
-              <div key={n} style={{ display: 'flex', gap: 10 }}>
-                <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'rgba(34,197,94,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: '#22c55e', fontWeight: 800, flexShrink: 0 }}>{n}</span>
-                <span style={{ fontSize: 12, color: 'rgba(240,240,240,0.4)', fontFamily: "'JetBrains Mono',monospace", lineHeight: 1.6 }}>{step}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div><span style={label}>Title</span><input value={title} onChange={e => setTitle(e.target.value)} style={{ ...input, fontSize: 14, fontWeight: 700 }} /></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div><span style={label}>Slug</span><input value={slug} onChange={e => setSlug(e.target.value)} style={{ ...input, fontFamily: "'JetBrains Mono',monospace" }} /></div>
+                <div><span style={label}>Tags</span><input value={tags} onChange={e => setTags(e.target.value)} placeholder="saas, ai, geo" style={input} /></div>
               </div>
-            ))}
-          </div>
-        </div>
+              <div><span style={label}>Excerpt</span><textarea value={excerpt} onChange={e => setExcerpt(e.target.value)} rows={2} style={{ ...input, resize: 'vertical' as const }} /></div>
+              <div><span style={label}>Body (Markdown)</span>
+                <textarea value={body} onChange={e => setBody(e.target.value)} rows={20} style={{ ...input, fontFamily: "'JetBrains Mono',monospace", resize: 'vertical' as const, lineHeight: 1.7 }} />
+              </div>
+              <button onClick={copyAll} style={{ width: '100%', padding: '14px', background: copied ? 'rgba(34,197,94,0.2)' : 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 12, color: '#22c55e', fontSize: 14, fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit' }}>
+                {copied ? '✅ Copied! Paste into INKRUX article file' : '📋 Copy Full Article (Frontmatter + Body)'}
+              </button>
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 12, padding: '16px 18px' }}>
+                <div style={{ fontSize: 11, color: 'rgba(240,240,240,0.35)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>To publish:</div>
+                {[['1', `Open: inkrux/app/article/${slug || 'your-slug'}/page.tsx`], ['2','Add to articles array in inkrux/app/api/feed.xml/route.ts'], ['3','git commit -m "feat: add article" && git push'], ['4','Vercel deploys in ~30s ✓']].map(([n, s]) => (
+                  <div key={n} style={{ display: 'flex', gap: 10, marginBottom: 6 }}>
+                    <span style={{ width: 18, height: 18, borderRadius: '50%', background: 'rgba(34,197,94,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, color: '#22c55e', fontWeight: 700, flexShrink: 0, marginTop: 2 }}>{n}</span>
+                    <span style={{ fontSize: 12, color: 'rgba(240,240,240,0.4)', fontFamily: "'JetBrains Mono',monospace" }}>{s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
-    </div>
-  );
-}
-
-function Field({ label, value, onChange, rows, mono, large }: {
-  label: string; value: string; onChange: (v: string) => void;
-  rows?: number; mono?: boolean; large?: boolean;
-}) {
-  const base = {
-    width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
-    borderRadius: 10, padding: '11px 14px', color: '#f0f0f0', outline: 'none',
-    fontFamily: mono ? "'JetBrains Mono',monospace" : "'Sora',sans-serif",
-    fontSize: large ? 14 : 12, boxSizing: 'border-box' as const, lineHeight: 1.6,
-  };
-  return (
-    <div>
-      <div style={{ fontSize: 10, color: 'rgba(240,240,240,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6, fontFamily: "'JetBrains Mono',monospace" }}>{label}</div>
-      {rows
-        ? <textarea value={value} onChange={e => onChange(e.target.value)} rows={rows} style={{ ...base, resize: 'vertical' }} />
-        : <input value={value} onChange={e => onChange(e.target.value)} style={base} />
-      }
     </div>
   );
 }
