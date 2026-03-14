@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
@@ -378,7 +379,25 @@ KryvLayer is at kryvlayer.kryv.network. The free tier allows one domain with up 
 export default function ArticleClient() {
   const params = useParams();
   const slug = params.slug as string;
-  const article = ARTICLES[slug];
+  const [article, setArticle] = React.useState<any>(ARTICLES[slug] || null);
+  const [loading, setLoading] = React.useState(!ARTICLES[slug]);
+
+  React.useEffect(() => {
+    if (ARTICLES[slug]) { setArticle(ARTICLES[slug]); return; }
+    fetch(`/api/articles?slug=${encodeURIComponent(slug)}`)
+      .then(r => r.json())
+      .then(data => { if (data.article) setArticle(data.article); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div style={{ minHeight:'100vh', background:'#040405', display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ fontSize:13, color:'rgba(240,240,240,0.3)', fontFamily:"'JetBrains Mono',monospace" }}>Loading...</div>
+      </div>
+    );
+  }
+
   if (!article) {
     return (
       <div style={{ minHeight:'100vh', background:'#040405', display:'flex', alignItems:'center', justifyContent:'center' }}>
